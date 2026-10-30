@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rekurzió lépésről lépésre</title>
+<meta name="description" content="Interaktív óraanyag 9–10. évfolyamnak: a rekurzív sorozat domínós feladaton, hívásfával, méréssel és kvízzel.">
+<style>
+:root{
+  --navy:#16243B; --blue:#2D5FA8; --amber:#F2B84B; --bg:#F6F4EE; --card:#FFFFFF; --line:#E3E0D6;
+  --muted:#4A5568; --ok:#1F7A4D; --okbg:#E3F3EA; --bad:#B3261E; --badbg:#FBE7E5; --code:#0E1828;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:var(--bg);color:var(--navy);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55;font-size:18px}
+header.top{position:sticky;top:0;z-index:10;background:var(--navy);color:#F6F4EE;border-bottom:4px solid var(--amber)}
+.bar{max-width:1040px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-weight:800;font-size:20px;margin-right:auto}
+nav.menu{display:flex;gap:4px;flex-wrap:wrap}
+nav.menu a{color:#D5DCE8;text-decoration:none;padding:6px 12px;border-radius:999px;font-weight:600;font-size:16px}
+nav.menu a:hover,nav.menu a:focus{background:#24385A;color:#fff}
+.points{background:var(--amber);color:var(--navy);font-weight:800;border-radius:999px;padding:6px 16px;font-size:16px;white-space:nowrap}
+main{max-width:1040px;margin:0 auto;padding:32px 20px 80px}
+.hero{padding:24px 0 8px}
+.eyebrow{color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:14px;margin:0 0 6px}
+h1{font-size:clamp(34px,6vw,56px);line-height:1.1;margin:0 0 12px}
+h2{font-size:clamp(26px,4vw,34px);line-height:1.2;margin:0 0 12px}
+h3{font-size:21px;margin:0 0 6px}
+p{margin:0 0 12px}
+.lead{font-size:20px;color:var(--muted);max-width:760px}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;margin:28px 0;box-shadow:0 1px 0 rgba(22,36,59,.04)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:760px){.grid3{grid-template-columns:1fr}}
+.mini{border:1px solid var(--line);border-radius:14px;padding:16px;background:#FBFAF6}
+.mini .big{font-size:30px;font-weight:800;color:var(--blue)}
+.tiles{display:flex;gap:28px;flex-wrap:wrap;margin:12px 0 16px}
+.tile{text-align:center;color:var(--muted);font-size:16px}
+.tile svg{display:block;margin:0 auto 6px;border-radius:6px}
+table.t{border-collapse:collapse;margin:8px 0 16px;width:100%;max-width:620px;font-variant-numeric:tabular-nums}
+table.t th,table.t td{border:1px solid var(--line);padding:8px 12px;text-align:center}
+table.t th{background:#EEF2F9}
+.formula{background:var(--blue);color:#fff;border-radius:14px;padding:18px 24px;font-size:clamp(22px,4vw,34px);font-weight:800;margin:12px 0;overflow-wrap:anywhere}
+.formula small{display:block;font-weight:400;font-size:17px;color:#E4ECF8;margin-top:4px}
+.seq{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.seq span{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-weight:700;font-variant-numeric:tabular-nums}
+.seq span.base{background:var(--amber);border-color:var(--amber)}
+.seq i{display:block;font-style:normal;font-weight:400;font-size:13px;color:var(--muted)}
+pre.code{background:var(--code);color:#F6F4EE;border-radius:14px;padding:18px 22px;overflow:auto;font:16px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin:12px 0}
+pre.code .cm{color:var(--amber)}
+pre.code .gap{background:var(--amber);color:var(--navy);border-radius:6px;padding:0 8px;font-weight:700}
+button,.btn{font:inherit;font-weight:700;border:2px solid var(--navy);background:#fff;color:var(--navy);padding:8px 16px;border-radius:12px;cursor:pointer}
+button:hover:not(:disabled){background:#EEF2F9}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.primary{background:var(--navy);color:#fff}
+button.primary:hover:not(:disabled){background:#24385A}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+.stepper{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+@media(max-width:760px){.stepper{grid-template-columns:1fr}}
+.panel{border:1px solid var(--line);border-radius:14px;padding:14px;background:#FBFAF6}
+.panel h3{font-size:16px;text-transform:uppercase;letter-spacing:.06em;color:var(--blue)}
+.tree{font:16px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;min-height:120px;overflow:auto}
+.tree .ln{white-space:nowrap}
+.tree .ln.cur{background:var(--amber);border-radius:6px}
+.tree .ln.base{color:var(--ok)}
+.tree .v{color:var(--blue);font-weight:700}
+.stack{display:flex;flex-direction:column;gap:6px;min-height:60px}
+.frame{background:#fff;border:2px solid var(--navy);border-radius:8px;padding:4px 10px;font:15px ui-monospace,Menlo,Consolas,monospace}
+.frame.top{background:var(--amber)}
+.msg{background:#EEF2F9;border-radius:10px;padding:10px 14px;margin:12px 0;min-height:48px}
+.nbtn.on{background:var(--navy);color:#fff}
+.meter{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:14px 0}
+.meter .box{border:1px solid var(--line);border-radius:14px;padding:14px;background:#FBFAF6}
+.meter .num{font-size:28px;font-weight:800;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.meter .box.hl{background:var(--blue);color:#fff;border-color:var(--blue)}
+.meter .box.hl small{color:#E4ECF8}
+small,.small{color:var(--muted);font-size:15px}
+input[type=range]{width:100%;accent-color:var(--blue)}
+input[type=number]{font:inherit;width:6.5em;padding:6px 8px;border:2px solid var(--navy);border-radius:10px}
+.bars{margin:10px 0}
+.bar2{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;margin:6px 0;font-size:15px}
+.bar2 .fill{height:18px;border-radius:9px;background:var(--blue);min-width:4px;transition:width .15s}
+.bar2 .fill.it{background:var(--amber)}
+.quiz{border:2px solid var(--line);border-radius:16px;padding:18px;margin:20px 0;background:#FFFEFB}
+.quiz .pts{display:inline-block;background:var(--amber);border-radius:999px;font-size:14px;font-weight:800;padding:2px 12px;margin-bottom:8px}
+.quiz .q{font-weight:700;margin-bottom:10px}
+.quiz .opts{display:grid;gap:8px}
+.quiz .opts button{text-align:left;font-weight:600;border-width:2px;border-color:var(--line)}
+.quiz .opts button.ok{background:var(--okbg);border-color:var(--ok);opacity:1}
+.quiz .opts button.bad{background:var(--badbg);border-color:var(--bad)}
+.fb{margin:10px 0 0;min-height:1.2em}
+.fb.ok{color:var(--ok);font-weight:600}
+.fb.bad{color:var(--bad);font-weight:600}
+.result{background:var(--navy);color:#fff;border-radius:18px;padding:28px;margin:28px 0}
+.result .score{font-size:56px;font-weight:800;color:var(--amber);line-height:1}
+.result button{background:transparent;color:#fff;border-color:#AEB9CC}
+footer{margin-top:40px;color:var(--muted);font-size:15px}
+footer a{color:var(--blue)}
+.sr{position:absolute;left:-9999px}
+@media(max-width:760px){
+  header.top{position:static}
+  html{scroll-padding-top:12px}
+  body{font-size:17px}
+  section.card{padding:20px}
+  .brand{font-size:18px}
+  .points{position:fixed;right:12px;bottom:12px;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="bar">
+    <span class="brand">Rekurzió lépésről lépésre</span>
+    <nav class="menu" aria-label="Fejezetek">
+      <a href="#bevezetes">Bevezetés</a><a href="#szabaly">Szabály</a><a href="#lepteto">Léptető</a>
+      <a href="#meres">Mérés</a><a href="#kod">Kód</a><a href="#teszt">Teszt</a>
+    </nav>
+    <span class="points" id="ptsBadge" aria-live="polite"><span id="pts">0</span> / <span id="ptsMax">21</span> pont</span>
+  </div>
+</header>
+
+<main>
+<div class="hero">
+  <p class="eyebrow">Digitális kultúra · 9–10. évfolyam · algoritmizálás</p>
+  <h1>Hányféleképpen fedhető le egy sáv?</h1>
+  <p class="lead">Egy egyszerű lefedési feladatból jutunk el a rekurzióig: megtanuljuk a szabályt, végigkövetjük a gép munkáját, megmérjük, mikor lassul le, és megnézzük a ciklusos megoldást is. Haladj fentről lefelé, a feladatokra pontot kapsz. Egy leckére kb. 30 perc kell.</p>
+</div>
+
+<section class="card" id="bevezetes">
+  <p class="eyebrow">1. Bevezetés</p>
+  <h2>A lefedési feladat</h2>
+  <p>Van egy 2 egység magas és n egység széles sávunk. Lefedhetjük <b>1×2-es dominókkal</b> (állva vagy fekve) és <b>2×2-es négyzetekkel</b>. Hányféle lefedés van?</p>
+  <p><b>n = 2</b> esetén három lefedést találunk:</p>
+  <div class="tiles">
+    <div class="tile"><svg viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Két álló dominó"><rect width="60" height="120" fill="#2D5FA8" stroke="#fff" stroke-width="5"/><rect x="60" width="60" height="120" fill="#2D5FA8" stroke="#fff" stroke-width="5"/></svg>két álló dominó</div>
+    <div class="tile"><svg viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Két fekvő dominó"><rect width="120" height="60" fill="#F2B84B" stroke="#fff" stroke-width="5"/><rect y="60" width="120" height="60" fill="#F2B84B" stroke="#fff" stroke-width="5"/></svg>két fekvő dominó</div>
+    <div class="tile"><svg viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Egy négyzet"><rect width="120" height="120" fill="#16243B" stroke="#fff" stroke-width="5"/></svg>egy 2×2-es négyzet</div>
+  </div>
+  <table class="t"><tr><th>n</th><th>1</th><th>2</th><th>3</th><th>4</th></tr><tr><td>lefedések száma</td><td>1</td><td>3</td><td>5</td><td>?</td></tr></table>
+  <p>Rajzold ki papíron n = 3-ra az összes lefedést, és számold meg őket!</p>
+  <div class="quiz" data-id="q1" data-answer="1" data-expl="n = 3 esetén 5 lefedés van: f(3) = f(2) + 2·f(1) = 3 + 2.">
+    <span class="pts">3 pont elsőre</span>
+    <p class="q">Hányféleképpen fedhető le a 2×3-as sáv?</p>
+    <div class="opts"><button>3</button><button>5</button><button>6</button><button>8</button></div>
+    <p class="fb" aria-live="polite"></p>
+  </div>
+</section>
+
+<section class="card" id="szabaly">
+  <p class="eyebrow">2. A szabály</p>
+  <h2>Az utolsó oszlop háromféleképpen zárható</h2>
+  <p>Nézzük a sáv jobb szélső részét. Háromféleképpen végződhet:</p>
+  <div class="grid3">
+    <div class="mini"><h3>Egy álló dominó</h3><p class="small">marad n−1 oszlop</p><div class="big">f(n−1)</div></div>
+    <div class="mini"><h3>Két fekvő dominó</h3><p class="small">marad n−2 oszlop</p><div class="big">f(n−2)</div></div>
+    <div class="mini"><h3>Egy 2×2-es négyzet</h3><p class="small">marad n−2 oszlop</p><div class="big">f(n−2)</div></div>
+  </div>
+  <div class="formula">f(n) = f(n−1) + 2·f(n−2)<small>alapeset: f(0) = 1 és f(1) = 1</small></div>
+  <p>Ezt <b>rekurzív szabálynak</b> hívjuk: az érték a kisebb n-hez tartozó értékekből áll össze. Az <b>alapeset</b> állítja meg a visszalépést, nélküle sosem érnénk a végére.</p>
+  <div class="seq" aria-label="A sorozat első elemei" id="seqBox"></div>
+  <div class="quiz" data-id="q2" data-answer="1" data-expl="f(5) = f(4) + 2·f(3) = 11 + 2·5 = 21.">
+    <span class="pts">3 pont elsőre</span>
+    <p class="q">Mennyi f(5), ha tudod, hogy f(3) = 5 és f(4) = 11?</p>
+    <div class="opts"><button>16</button><button>21</button><button>22</button><button>27</button></div>
+    <p class="fb" aria-live="polite"></p>
+  </div>
+</section>
+
+<section class="card" id="lepteto">
+  <p class="eyebrow">3. Léptető</p>
+  <h2>Hogyan számolja ki a gép?</h2>
+  <p>A függvény önmagát hívja kisebb n-nel. Minden hívás kap egy keretet a <b>hívási veremben</b>; ha egy hívás végez, a kerete eltűnik. Válassz egy n-t, és lépj végig a számoláson!</p>
+  <div class="row" id="nPick" role="group" aria-label="n értéke"></div>
+  <div class="row">
+    <button id="stBack">Vissza</button><button id="stNext" class="primary">Előre</button>
+    <button id="stPlay">Lejátszás</button><button id="stReset">Elölről</button>
+    <span class="small" id="stInfo"></span>
+  </div>
+  <div class="msg" id="stMsg" aria-live="polite"></div>
+  <div class="stepper">
+    <div class="panel"><h3>Hívásfa (behúzás = mélység)</h3><div class="tree" id="tree"></div></div>
+    <div class="panel"><h3>Hívási verem (felül a futó)</h3><div class="stack" id="stack"></div></div>
+  </div>
+  <p class="small">Figyeld meg: ugyanaz a hívás (például Rec(2)) többször is megjelenik, és minden alkalommal újra kiszámolódik.</p>
+</section>
+
+<section class="card" id="meres">
+  <p class="eyebrow">4. Mérés</p>
+  <h2>Mikor lassul le a rekurzió?</h2>
+  <p>Húzd a csúszkát, és nézd, hány hívás kell az n-edik elemhez. A rekurzív megoldás hívásainak száma gyorsan nő, az iteratív megoldás (ciklus) csak n−1 lépést tesz.</p>
+  <label for="nRange" class="small">n értéke: <b id="nVal">10</b></label>
+  <input type="range" id="nRange" min="1" max="40" value="10">
+  <div class="meter">
+    <div class="box"><small>f(n) értéke</small><div class="num" id="mF">–</div></div>
+    <div class="box hl"><small>Rekurzív hívások száma</small><div class="num" id="mC">–</div></div>
+    <div class="box"><small>Iteratív ciklusmenetek</small><div class="num" id="mI">–</div></div>
+  </div>
+  <div class="bars" aria-hidden="true">
+    <div class="bar2"><span>rekurzív</span><div class="fill" id="bC"></div></div>
+    <div class="bar2"><span>iteratív</span><div class="fill it" id="bI"></div></div>
+    <p class="small">A hosszak logaritmikus skálán készültek, különben az iteratív oszlop nem látszana.</p>
+  </div>
+  <div class="row"><button id="runReal" class="primary">Futtasd le valóban a rekurziót</button><span class="small" id="realOut">(n ≤ 35 esetén)</span></div>
+</section>
+
+<section class="card" id="kod">
+  <p class="eyebrow">5. A kód</p>
+  <h2>A rekurzív és az iteratív függvény C#-ban</h2>
+  <p>A függvény a SPOJ 339 feladat szabályát valósítja meg, tetszőleges kezdőértékekkel: f(0) = p, f(1) = pp, f(n) = f(n−1) + 2·f(n−2). A lefedési feladatnál p = 1 és pp = 1.</p>
+  <h3>Rekurzív változat</h3>
+<pre class="code"><span class="cm">// n: hányadik elem, p = f(0), pp = f(1)</span>
+static long Rec(int n, long p, long pp)
+{
+    if (n == 0) return p;      <span class="cm">// alapeset</span>
+    if (n == 1) return pp;     <span class="cm">// alapeset</span>
+    <span class="gap">?????</span>
+}</pre>
+  <div class="quiz" data-id="q3" data-answer="1" data-expl="Az alapeset nélkül a függvény egyre kisebb n-et hívna (negatív számokig is), így a verem megtelik: veremtúlcsordulás.">
+    <span class="pts">3 pont elsőre</span>
+    <p class="q">Mi történik, ha az alapeseteket (az n == 0 és n == 1 sort) kitörlöd?</p>
+    <div class="opts"><button>A függvény mindig 0-t ad vissza</button><button>A rekurzió sosem áll meg, a program veremtúlcsordulással leáll</button><button>Csak n = 0-nál lesz hibás az eredmény</button><button>A program gyorsabb lesz</button></div>
+    <p class="fb" aria-live="polite"></p>
+  </div>
+  <div class="quiz" data-id="q4" data-answer="1" data-expl="A szabály: f(n) = f(n−1) + 2·f(n−2). A 2· szorzó a második tagra vonatkozik.">
+    <span class="pts">3 pont elsőre</span>
+    <p class="q">Mi kerül a ????? helyére?</p>
+    <div class="opts">
+      <button><code>return Rec(n - 1, p, pp) + Rec(n - 2, p, pp);</code></button>
+      <button><code>return Rec(n - 1, p, pp) + 2 * Rec(n - 2, p, pp);</code></button>
+      <button><code>return Rec(n, p, pp) + 2 * Rec(n - 1, p, pp);</code></button>
+      <button><code>return 2 * Rec(n - 1, p, pp) + Rec(n - 2, p, pp);</code></button>
+    </div>
+    <p class="fb" aria-live="polite"></p>
+  </div>
+  <h3>Iteratív változat</h3>
+<pre class="code">static long Iter(int n, long p, long pp)
+{
+    if (n == 0) return p;
+    for (int i = 2; i &lt;= n; i++)
+    {
+        long next = <span class="gap">?????</span>;
+        p = pp;
+        pp = next;
+    }
+    return pp;
+}</pre>
+  <div class="quiz" data-id="q5" data-answer="1" data-expl="pp az utolsó, p az azt megelőző elem, ezért next = pp + 2·p.">
+    <span class="pts">3 pont elsőre</span>
+    <p class="q">Mi kerül a ????? helyére?</p>
+    <div class="opts"><button><code>pp + p</code></button><button><code>pp + 2 * p</code></button><button><code>p + 2 * pp</code></button><button><code>2 * pp</code></button></div>
+    <p class="fb" aria-live="polite"></p>
+  </div>
+  <h3>Próbáld ki</h3>
+  <p class="small">A számolás itt a böngészőben fut, a C# függvény logikájával megegyezően. A SPOJ minta: n = 5, p = 1, pp = 2 esetén 32 a válasz.</p>
+  <div class="row">
+    <label>n <input type="number" id="tryN" min="0" max="80" value="5"></label>
+    <label>p <input type="number" id="tryP" value="1"></label>
+    <label>pp <input type="number" id="tryPP" value="2"></label>
+    <button id="tryGo" class="primary">Számold ki</button>
+  </div>
+  <div class="msg" id="tryOut" aria-live="polite">Az eredmény itt jelenik meg.</div>
+</section>
+
+<section class="card" id="teszt">
+  <p class="eyebrow">6. Teszt</p>
+  <h2>Mit tanultál?</h2>
+  <div class="quiz" data-id="q6" data-answer="1" data-expl="A rekurzív megoldás ugyanazokat a részeredményeket sokszor újraszámolja, ezért a hívások száma exponenciálisan nő. Az iteratív megoldás minden értéket egyszer számol ki.">
+    <span class="pts">3 pont elsőre</span>
+    <p class="q">Miért lassabb a rekurzív megoldás az iteratívnál ennél a feladatnál?</p>
+    <div class="opts"><button>Mert a gép nem szereti a rekurziót</button><button>Mert ugyanazokat a részeredményeket újra és újra kiszámolja</button><button>Mert több változót használ</button><button>Mert a ciklus mindig gyorsabb, bármilyen feladatnál</button></div>
+    <p class="fb" aria-live="polite"></p>
+  </div>
+  <div class="quiz" data-id="q7" data-answer="2" data-expl="C(4) = 1 + C(3) + C(2) = 1 + 5 + 3 = 9. A léptetőben n = 4-nél megszámolhatod.">
+    <span class="pts">3 pont elsőre</span>
+    <p class="q">Hány Rec hívás indul összesen a Rec(4) hívásból (magát is beleszámolva)? Segít a léptető.</p>
+    <div class="opts"><button>5</button><button>7</button><button>9</button><button>11</button></div>
+    <p class="fb" aria-live="polite"></p>
+  </div>
+  <div class="result" id="result">
+    <p class="small" style="color:#AEB9CC">Eredményed</p>
+    <div class="score"><span id="rPts">0</span> / <span id="rMax">21</span></div>
+    <p id="rMsg" style="margin-top:10px">Oldd meg a feladatokat, hogy lásd az eredményed.</p>
+    <button id="resetAll">Pontok törlése, újrakezdés</button>
+  </div>
+</section>
+
+<footer>
+  <p>Készítette: Ritzinger Zoltán · Algoritmizálás és problémamegoldás tanítása gy. (SZTE) · 2026.</p>
+  <p>Kapcsolódó feladat: <a href="https://www.spoj.com/problems/339/" target="_blank" rel="noopener">SPOJ 339 – Recursive Sequence</a>. A pontokat a böngésző a saját eszközödön tárolja, sehova sem küldi el.</p>
+</footer>
+</main>
+
+<script>
+(function(){
+'use strict';
+var $=function(s,r){return (r||document).querySelector(s)};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+
+/* ---------- pontok (localStorage, hibatűrően) ---------- */
+var mem={};
+function load(){try{return JSON.parse(localStorage.getItem('rek_scores_v1')||'{}')}catch(e){return mem}}
+function save(v){mem=v;try{localStorage.setItem('rek_scores_v1',JSON.stringify(v))}catch(e){}}
+var scores=load();
+var quizzes=$$('.quiz');
+var maxPts=quizzes.length*3;
+function updatePts(){
+  var sum=0,done=0;
+  quizzes.forEach(function(q){var s=scores[q.dataset.id];if(s&&s.done){sum+=s.pts;done++}});
+  $('#pts').textContent=sum;$('#ptsMax').textContent=maxPts;
+  $('#rPts').textContent=sum;$('#rMax').textContent=maxPts;
+  var m;
+  if(done<quizzes.length){m='Megoldottál '+done+' kérdést a '+quizzes.length+' közül.';}
+  else if(sum>=maxPts*0.85){m='Remek! A rekurzió alapjait biztosan tudod.';}
+  else if(sum>=maxPts*0.6){m='Jó munka! Nézd át újra a léptetőt a bizonytalan részeknél.';}
+  else {m='Még gyakorolj: járd végig újra a léptetőt és a mérést.';}
+  $('#rMsg').textContent=m;
+}
+quizzes.forEach(function(q){
+  var id=q.dataset.id,ans=+q.dataset.answer,btns=$$('.opts button',q),fb=$('.fb',q);
+  var st=scores[id]||{tries:0,done:false,pts:0};
+  function finish(){btns.forEach(function(b){b.disabled=true});btns[ans].classList.add('ok');btns[ans].disabled=false;btns[ans].style.cursor='default';fb.className='fb ok';fb.textContent='Helyes! +'+st.pts+' pont. '+q.dataset.expl;}
+  if(st.done)finish();
+  btns.forEach(function(b,i){b.addEventListener('click',function(){
+    if(st.done)return;
+    if(i===ans){st.pts=st.tries===0?3:(st.tries===1?1:0);st.done=true;scores[id]=st;save(scores);finish();updatePts();}
+    else{st.tries++;scores[id]=st;save(scores);b.classList.add('bad');b.disabled=true;fb.className='fb bad';fb.textContent='Ez nem a jó válasz, próbáld újra!';}
+  });});
+});
+$('#resetAll').addEventListener('click',function(){save({});location.reload();});
+updatePts();
+
+/* ---------- sorozat ---------- */
+function fArr(N){var f=[1n,1n];for(var i=2;i<=N;i++)f.push(f[i-1]+2n*f[i-2]);return f;}
+function cArr(N){var c=[1,1];for(var i=2;i<=N;i++)c.push(1+c[i-1]+c[i-2]);return c;}
+var F=fArr(80),C=cArr(80);
+var seq=$('#seqBox');
+for(var i=0;i<=9;i++){var s=document.createElement('span');if(i<2)s.className='base';s.innerHTML='<i>n = '+i+'</i>'+F[i].toString();seq.appendChild(s);}
+
+/* ---------- léptető ---------- */
+function trace(n){
+  var ev=[],id=0;
+  function rec(m,d){var my=id++;ev.push({t:'call',id:my,n:m,d:d});var v;if(m<2)v=1;else v=rec(m-1,d+1)+2*rec(m-2,d+1);ev.push({t:'ret',id:my,n:m,d:d,v:v});return v;}
+  rec(n,0);return ev;
+}
+var curN=4,ev=trace(curN),k=0,timer=null;
+var pick=$('#nPick');
+for(var n=1;n<=6;n++){(function(n){var b=document.createElement('button');b.className='nbtn';b.textContent='n = '+n;b.addEventListener('click',function(){setN(n)});pick.appendChild(b);})(n);}
+function stopPlay(){if(timer){clearInterval(timer);timer=null;$('#stPlay').textContent='Lejátszás';}}
+function setN(n){stopPlay();curN=n;ev=trace(n);k=0;$$('.nbtn').forEach(function(b,i){b.classList.toggle('on',i+1===n);});render();}
+function render(){
+  var shown=ev.slice(0,k),lines=[],stack=[];
+  shown.forEach(function(e){
+    if(e.t==='call'){lines[e.id]={n:e.n,d:e.d,v:null};stack.push(e.id);}
+    else{lines[e.id].v=e.v;stack.pop();}
+  });
+  var last=shown.length?shown[shown.length-1]:null;
+  var tree=$('#tree');tree.innerHTML='';
+  lines.forEach(function(L,id){
+    var d=document.createElement('div');d.className='ln'+(L.n<2?' base':'')+(last&&last.id===id?' cur':'');
+    d.style.paddingLeft=(L.d*26)+'px';
+    d.innerHTML='Rec('+L.n+')'+(L.v!==null?' <span class="v">→ '+L.v+'</span>':'');
+    tree.appendChild(d);
+  });
+  var st=$('#stack');st.innerHTML='';
+  for(var j=stack.length-1;j>=0;j--){var f=document.createElement('div');f.className='frame'+(j===stack.length-1?' top':'');f.textContent='Rec('+lines[stack[j]].n+')';st.appendChild(f);}
+  if(!stack.length){st.innerHTML='<span class="small">üres verem</span>';}
+  var calls=lines.length;
+  $('#stInfo').textContent='Lépés: '+k+' / '+ev.length+' · eddigi hívások: '+calls+' / '+C[curN];
+  var msg;
+  if(!last)msg='Kezdés előtt: még nincs hívás. Nyomd meg az Előre gombot, és megindul a Rec('+curN+').';
+  else if(last.t==='call'&&last.n<2)msg='Meghívjuk a Rec('+last.n+')-t. Ez alapeset, azonnal visszaad egy értéket.';
+  else if(last.t==='call')msg='Meghívjuk a Rec('+last.n+')-t. Először a Rec('+(last.n-1)+')-et kell kiszámolni, utána a Rec('+(last.n-2)+')-t.';
+  else if(last.n<2)msg='A Rec('+last.n+') visszaadta: '+last.v+'. A kerete eltűnik a veremből.';
+  else msg='A Rec('+last.n+') mindkét ágát kiszámoltuk, értéke '+last.v+'. A kerete eltűnik a veremből.';
+  if(k===ev.length)msg+=' Kész! Rec('+curN+') = '+ev[ev.length-1].v+', összesen '+C[curN]+' hívással.';
+  $('#stMsg').textContent=msg;
+  $('#stBack').disabled=k===0;$('#stNext').disabled=k===ev.length;
+}
+$('#stNext').addEventListener('click',function(){if(k<ev.length){k++;render();}});
+$('#stBack').addEventListener('click',function(){stopPlay();if(k>0){k--;render();}});
+$('#stReset').addEventListener('click',function(){stopPlay();k=0;render();});
+$('#stPlay').addEventListener('click',function(){
+  if(timer){stopPlay();return;}
+  if(k===ev.length)k=0;
+  $('#stPlay').textContent='Megállítás';
+  timer=setInterval(function(){if(k<ev.length){k++;render();}else{stopPlay();}},600);
+});
+setN(4);
+
+/* ---------- mérés ---------- */
+function fmt(x){return String(x).replace(/\B(?=(\d{3})+(?!\d))/g,' ');}
+var lmax=Math.log10(C[40]);
+function meres(){
+  var n=+$('#nRange').value;$('#nVal').textContent=n;
+  $('#mF').textContent=fmt(F[n]);$('#mC').textContent=fmt(C[n]);$('#mI').textContent=fmt(Math.max(0,n-1));
+  $('#bC').style.width=Math.max(1,Math.log10(C[n])/lmax*100)+'%';
+  $('#bI').style.width=Math.max(1,Math.log10(Math.max(1,n-1)+1)/lmax*100)+'%';
+  $('#runReal').disabled=n>35;
+  $('#realOut').textContent=n>35?'(n ≤ 35 esetén futtatható, mert ennél a böngésző túl sokáig számolna)':'(valódi futás ebben a böngészőben)';
+}
+$('#nRange').addEventListener('input',meres);meres();
+$('#runReal').addEventListener('click',function(){
+  var n=+$('#nRange').value,calls=0;
+  function rec(m){calls++;return m<2?1:rec(m-1)+2*rec(m-2);}
+  var t0=performance.now(),v=rec(n),ms=performance.now()-t0;
+  var t1=performance.now();var a=1,b=1;for(var i=2;i<=n;i++){var nx=b+2*a;a=b;b=nx;}var ims=performance.now()-t1;
+  $('#realOut').textContent='n = '+n+': Rec = '+fmt(v)+', hívások: '+fmt(calls)+', idő: '+ms.toFixed(1).replace('.',',')+' ms. Ciklussal ugyanez: '+(ims<0.01?'kevesebb mint 0,01':ims.toFixed(2).replace('.',','))+' ms.';
+});
+
+/* ---------- kipróbáló ---------- */
+$('#tryGo').addEventListener('click',function(){
+  var n=Math.floor(+$('#tryN').value),p,pp;
+  var out=$('#tryOut');
+  try{p=BigInt(Math.trunc(+$('#tryP').value));pp=BigInt(Math.trunc(+$('#tryPP').value));}catch(e){out.textContent='Egész számokat adj meg.';return;}
+  if(!(n>=0&&n<=80)){out.textContent='Az n legyen 0 és 80 közötti egész szám.';return;}
+  var r;
+  if(n===0)r=p;else{var a=p,b=pp;for(var i=2;i<=n;i++){var nx=b+2n*a;a=b;b=nx;}r=b;}
+  var lim=9223372036854775807n,over=(r>lim||r<-lim-1n);
+  out.textContent='f('+n+') = '+r.toString()+(over?'   (Figyelem: C#-ban a long típus ennél kisebb értékeket tud tárolni, itt túlcsordulás lenne!)':'');
+});
+})();
+</script>
+</body>
+</html>
